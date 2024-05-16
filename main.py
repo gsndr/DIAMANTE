@@ -21,11 +21,10 @@ gpu_options = tf.compat.v1.GPUOptions(allow_growth=True)
 session = tf.compat.v1.InteractiveSession(config=tf.compat.v1.ConfigProto(gpu_options=gpu_options))
 
 import Utils
-import HyperoptKDistillation
-import HyperoptSDistillation
+
 import HyperoptUnet
 from tensorflow.keras.models import load_model
-import HyperTeacher
+
 
 from sklearn.metrics import precision_recall_fscore_support, accuracy_score, confusion_matrix
 from tensorflow.python.client import device_lib
@@ -39,7 +38,7 @@ else:
 def main():
     dataset = sys.argv[1]
     config = configparser.ConfigParser()
-    config.read('CONFIG.conf')
+    config.read('CONFIG1.conf')
     # this contains path dataset and models
     dsConf = config[dataset]
     # this contain the variable related to the flow
@@ -66,7 +65,6 @@ def main():
 
     resize = int(settings.get('RESIZE'))
 
-    attention = int(settings.get('ATTENTION'))
 
     attack = int(dsConf.get('attack'))
     scale = int(settings.get('SCALE'))
@@ -94,14 +92,7 @@ def main():
     if (int(settings.get('PREPROCESSING')) == 1):
         from PreprocessingImages import PreprocessingImages
         preprocessing=PreprocessingImages((tilesSize,tilesSize,ch), (tilesSize,tilesSize), rChannel, [12], tiles=1, scale=scale)
-        '''
-        if (int(settings.get('DOUBLE')) == 1):
-            preprocessing.images(pathTrainImage, True)
-            preprocessing.images(pathTestImage, False)
-            preprocessing.images(pathTrainImage1, True)
-            preprocessing.images(pathTestImage1, False)
-        else:
-        '''
+
         preprocessing.images(pathTrainImage, True, pathTestImage)
         preprocessing.images(pathTestImage, False)
         if (int(settings.get('PREPROCESSING_MASKS')) == 1):
@@ -109,11 +100,7 @@ def main():
             preprocessing.masks(pathTestMask, dictChange, ds)
 
     if tiles:
-        '''
-        if (int(settings.get('DOUBLE')) == 1):
-            pathTrainImage1 = pathTrainImage1 + 'Tiles/'
-            pathTestImage1 = pathTestImage1 + 'Tiles/'
-        '''
+
 
         pathTrainImage = pathTrainImage + 'Tiles/'
         pathTestImage = pathTestImage + 'Tiles/'
@@ -169,8 +156,6 @@ def main():
                 name_model = pathModel + 'unet_resize_' + str(resize) + '_scale' + str(scale) + '_hybridUnet'
                 name_model = name_model + '_sum_' + str(sum)
 
-        if attention:
-            name_model = name_model + '_attention'
 
 
         print(name_model)
@@ -179,12 +164,7 @@ def main():
         # name_model = 'Models/Baptistev2/unet_resize_1_model.tf'
         resizeChannel = False
         pathImagesSave = 'Images/'  # qui
-        # import SatelliteSelfUnet
-        # shallow=[5,4,3]
-        # model = SatelliteSelfUnet.satellite_unet( (
-        # 32, 32, 12), shallow, attention=1, dropout=0.1675)
-        # print(len(model.layers))
-        # model.load_weights(name_model)
+
         from losses import dice_coef_self, accuracy_teacher, f1, accuracy
         model = tf.keras.models.load_model(name_model+'_model.tf', compile=False,
                                            custom_objects={"dice_coef_self": dice_coef_self, "accuracy_teacher": f1,
@@ -223,12 +203,7 @@ def main():
                 batch_size=size_test,
                 nb_classes=2, split=0, train=False, resize=resize, size=(shape, shape, ch))
 
-        # pathTestMask='../../DS/SWIFT/Baptistev2/Tiling/masks/'
-        # pathTestImage = '../../DS/SWIFT/Baptistev2/Tiling/Tiles/'
 
-        # pathTestMask = 'Data/Fires/masks/Tiles/'
-
-        # pathTestImage='Data/Hanna/All/'
 
         print(pathTestMask)
         lst = os.listdir(pathTestMask)  # your directory path
@@ -258,18 +233,7 @@ def main():
         Utils.print_results(name_model, YTestGlobal, Y_predicted, model, Y_prob)
         cm = confusion_matrix(YTestGlobal, Y_predicted)
         print(Utils.res(cm))
-        '''
 
-        Utils.print_results(dsConf.get('pathModels') + 'students_', YTestGlobal, allstudents, model, Y_prob)
-        Y_predicted = Y_predicted  # here
-        Utils.print_results(dsConf.get('pathModels') + 'students1_', YTestGlobal, allStud1, model, Y_prob)
-
-        Utils.print_results(dsConf.get('pathModels') + 'students2_', YTestGlobal, allStud2, model, Y_prob)
-
-        Utils.print_results(dsConf.get('pathModels') + 'students3_', YTestGlobal, allStud3, model, Y_prob)
-
-        Utils.print_results(dsConf.get('pathModels') + 'teacher_', YTestGlobal, Y_teacher, model, Y_prob)
-        '''
 
 
         thisdict = {
@@ -320,9 +284,24 @@ def main():
             '34': 12,
 
         }
-        
+        # vitogee
         thisdict = {
-            '31': 35
+            '78': 81,
+            '79': 28,
+            '80': 36,
+            '81': 70,
+            '82': 54,
+            '83': 4,
+            '84': 36,
+            '85': 49,
+            '86': 12,
+            '87': 24,
+            '88': 6,
+            '89': 42,
+            '90': 24,
+            '91': 72,
+            '92': 6,
+            '93': 6,
 
         }
         
