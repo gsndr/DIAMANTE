@@ -4,7 +4,6 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.layers import Conv2D, Dense, Flatten, Lambda, Dropout, Conv2DTranspose
 from keras.optimizers import Adam
 
-# from Distiller import Distiller
 import os
 import csv
 import math
@@ -33,7 +32,6 @@ from sklearn.metrics import balanced_accuracy_score
 from sklearn.model_selection import train_test_split
 
 import time
-import ModelsNN
 
 from sklearn.metrics import precision_recall_fscore_support, accuracy_score, confusion_matrix
 import multi_image_generator as image_generator
