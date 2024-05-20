@@ -50,7 +50,7 @@ The repository contains the following scripts:
 
 ## Replicate the experiments
 Modify the following code in the main.py script to change the beaviour of ROULETTE
-Link to the learned models [MODELS]([[https://drive.google.com/drive/folders/1NbkApPwjgzWX2s-zZEb7gSDP1oT3Ea4m?usp=sharing](https://drive.google.com/drive/folders/16u83KnN996dollCMzUdgOEL6do6p5NJr?usp=drive_link](https://drive.google.com/drive/folders/1j0nxUXlBo2dUZin5sXupeGxMx2N1-slh?usp=sharing))
+Link to the learned models [MODELS]((https://drive.google.com/drive/folders/1j0nxUXlBo2dUZin5sXupeGxMx2N1-slh?usp=sharing))
 
 
 
