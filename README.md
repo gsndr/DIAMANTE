@@ -42,6 +42,18 @@ The datasets used are:
 
 
 
+To launch the dataset pipeline download on your own you have to launch:
+```
+python Data/planetary_download.py
+```
+You have also to specify these parameters into ```planetary_download.py``` **main()** function:
+* **base_out_path**: defines the output path, where the Sentinel 1 and Sentinel 2 images will be downlaoded 
+* **base_geojson_path**: the path where the geojson defining each scene is stored 
+* **start_date** and **end_date**: defining the search interval for Sentinel 2 search images.
+
+All the required packages needed to run the download pipeline are described in ```Data/requirements.txt``` file.
+
+
 ## How to use
 
 The repository contains the following scripts:
