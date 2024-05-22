@@ -93,7 +93,7 @@ def getRasterData(extent, prefix, base_geojson_path, base_out_path, start_date, 
             best_cloud_cover_item['num_json'] = prefix
 
     if best_cloud_cover_item == {}:
-        print('[ATTENZIONE] Nessuna Ground Truth senza nuvole è stata trovata!')
+        print('[WARNING] No cloudless Ground Truth was found!')
     else:
         outputFileName = os.path.join(base_out_path, 'sentinel_2', f'geojson_{prefix}.tif')
         createGeoTiff(best_cloud_cover_item['data'], outputFileName)
@@ -148,9 +148,9 @@ def get_sentinel_1_data(extent, s2_attr, base_out_path):
                     datetime=str_date_interval,
                     bbox=extent
                 )
-                print(f'Allargando date {str_date_interval}')
+                print(f'Expanding dates {str_date_interval}')
                 items = search.get_all_items()
-            print(f'Trovate {str(len(items))} rilevazioni Sentinel 1 per geojson_{id} in date {str_date_interval}')
+            print(f'Found {str(len(items))} Sentinel 1 detections for geojson_{id} on date {str_date_interval}')
         item = items[0]
         proj = item.properties.get('proj:epsg')
         print(f's1 ({proj}) => {item.id}')
@@ -190,7 +190,7 @@ def main():
                                                   base_out_path=base_out_path, start_date=start_date, end_date=end_date)
             best_results.append(best_cloud_cover_item)
     except Exception as e:
-        print(f'Errore {e}..... salvataggio csv...')
+        print(f'Error:  {e}..... \nSaving csv...')
 
     df_res = pd.DataFrame(best_results)
     df_res.to_csv('planetary_results.csv', sep="\t", index=False)
