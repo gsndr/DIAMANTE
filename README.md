@@ -40,7 +40,8 @@ Packages needed are:
 The following [DATASETS]([https://drive.google.com/drive/folders/1NbkApPwjgzWX2s-zZEb7gSDP1oT3Ea4m?usp=sharing](https://drive.google.com/drive/folders/16u83KnN996dollCMzUdgOEL6do6p5NJr?usp=drive_link)).
 The datasets used are:
 
-
+## Data
+The models used for the experimental setting are reported in [MODELS](https://drive.google.com/drive/folders/1j0nxUXlBo2dUZin5sXupeGxMx2N1-slh?usp=sharing)
 
 To launch the dataset pipeline download on your own you have to launch:
 ```
