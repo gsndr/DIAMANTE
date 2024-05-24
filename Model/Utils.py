@@ -97,7 +97,7 @@ def flattenList(l):
 
 
 
-def print_results(path, y_true, y_pred,  model, non_rounded_y_pred=None, write=True):
+def print_results(path, y_true, y_pred,  model, non_rounded_y_pred=None):
     """
       FUnction saving the classification report of the single outputs classifiers in  .txt format
       :param path: path to save the report
@@ -161,18 +161,12 @@ def print_results(path, y_true, y_pred,  model, non_rounded_y_pred=None, write=T
         val = val + str(auc_value)
 
 
+    with open(path + '_results.txt', 'w', encoding='utf-16') as file:
+        file.write(val)
 
 
 
-    if write:
-        with open(path + '_results.txt', 'w', encoding='utf-16') as file:
-            file.write(val)
-            file.write('\n\n----------- Summary ---------------\n')
-            model.summary(print_fn=lambda x: file.write(x + '\n'))
 
-
-    else:
-        return val
 
 def predictionWithResizeMulti(path, images, model, input_shape=(32, 32, 12)):
     allTrue = []
@@ -245,3 +239,58 @@ def predictionWithResizeMultiNoL(path, images, model, input_shape=(32, 32, 12)):
         allPred.append(pred)
 
     return allTrue, allPred, allPredNoRounded
+
+
+
+def mergeImage(image, Y_predicted):
+    y, x = image.shape
+    xi = 0
+    yi = 0
+    imgAll = np.zeros((y, x))
+
+
+    if int((y % 32)) == 0:
+        rows = int((y / 32))
+    else:
+        rows = int((y / 32)) + 1
+
+    if int((x % 32)) == 0:
+        columns = int((x / 32))
+    else:
+        columns = int((x / 32)) + 1
+
+
+    i = 0
+    cone = 0
+    y_offset = 0
+
+    for j in range(0, rows):
+
+        while xi < x:
+            print(xi)
+            print(i)
+            item = Y_predicted[i]
+            print(item.shape)
+
+            cone = cone + np.count_nonzero(item == 1)
+
+            if x - xi < 32:
+                x_offset = x - xi
+            else:
+                x_offset = 32
+
+            if y - yi < 32:
+                y_offset = y - yi
+            else:
+                y_offset = 32
+
+            Y_pred = np.resize(item, (y_offset, x_offset))
+
+            imgAll[yi:yi + y_offset, xi:xi + x_offset] = Y_pred
+            xi = xi + x_offset
+            i = i + 1
+        xi = 0
+        yi = yi + y_offset
+
+    print(imgAll.shape)
+    return imgAll

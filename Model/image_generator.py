@@ -68,15 +68,12 @@ class ImageMaskGenerator(tf.keras.utils.Sequence):
                                                          self.batch_size]
         batch_y = self.masks_list[idx * self.batch_size:(idx + 1) *
                                                         self.batch_size]
-        # print(batch_x)
+
         images=[]
-        fileList=[]
-        fileMask=[]
+
 
         for file in batch_x:
             a = np.load(file)
-            #a=a/10000 #change this
-            #a = (a - np.min(a)) / (np.max(a) - np.min(a))
          
             if self.resize:
                 prep=Preprocessing()
@@ -85,13 +82,9 @@ class ImageMaskGenerator(tf.keras.utils.Sequence):
                
             images.append(a)
         images_batch=np.array(images).astype('float')
-        #print('images')
-        #print(images_batch.shape)
+
        
-        
-        
-       
-        #images_batch = np.array([np.load(file) for file in batch_x]).astype('float')
+
         masks_raw=[]
         for file in batch_y:
             m=np.load(file)
@@ -100,8 +93,7 @@ class ImageMaskGenerator(tf.keras.utils.Sequence):
                 m=prep.resize_with_padding(m, size=(self.size[0],self.size[1],1))
             masks_raw.append(m)
         masks_batch= np.array(masks_raw).astype('float')
-        #print('masks')
-        #print(masks_batch.shape)
+
         
        
 
@@ -110,10 +102,7 @@ class ImageMaskGenerator(tf.keras.utils.Sequence):
 
 
 
-        # print(images_batch.shape)
 
-        #masks_raw = np.array([np.load(file) for file in batch_y])
-        #masks_batch = np.array([mask for mask in masks_raw]).astype('float')
         if self.augmentation:
             import albumentations as A
             aug = A.HorizontalFlip(p=1)
@@ -122,17 +111,12 @@ class ImageMaskGenerator(tf.keras.utils.Sequence):
             aug3 = A.RandomRotate90(p=1)
             aug4 = A.Transpose(p=1)
             aug5 = A.GridDistortion(p=1)
-            #aug6 = A.GaussNoise(p=1)
 
-
-            #aug8=A.Superpixels(p=1)
 
             for i in range(0, len(masks_batch)):
                 img = images_batch[i]
                 mask = masks_batch[i]
-                # print('shape')
-                # print(images_batch.shape)
-                # print(masks_batch.shape)
+
                 augmented = aug(image=img, mask=mask)
                 imgA = np.expand_dims(augmented['image'], axis=0)
                 maskA = np.expand_dims(augmented['mask'], axis=0)
@@ -159,17 +143,6 @@ class ImageMaskGenerator(tf.keras.utils.Sequence):
                 maskA = np.expand_dims(augmented['mask'], axis=0)
                 images_batch = np.append(images_batch, imgA, axis=0)
                 masks_batch = np.append(masks_batch, maskA, axis=0)
-                '''
-                augmented = aug6(image=img, mask=mask)
-                imgA = np.expand_dims(augmented['image'], axis=0)
-                maskA = np.expand_dims(augmented['mask'], axis=0)
-                images_batch = np.append(images_batch, imgA, axis=0)
-                masks_batch = np.append(masks_batch, maskA, axis=0)
-                '''
-  
 
-
-            #print(images_batch.shape)
-            #print(masks_batch.shape)
         return images_batch, masks_batch
 

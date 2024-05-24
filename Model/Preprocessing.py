@@ -19,13 +19,9 @@ class Preprocessing():
         else:
             height, width = image.shape
 
-        # Calculate the aspect ratio of the image
-        aspect_ratio = height / width
 
         # Calculate the new height and width after resizing to (224,224)
         new_height, new_width, new_channels = size
-
-        # Create a black image with the target size
 
 
         # Calculate the number of rows/columns to add as padding
@@ -50,37 +46,7 @@ class Preprocessing():
         return padded_image
 
 
-    def tiffToNumpy(self, in_path, out_path):
-        for root, _, files in os.walk(in_path):
-            files.sort()
-            for file in files:
-                imgarr = io.imread(os.path.join(root, file))
-                print(imgarr.shape)
-                print(imgarr.dtype)
-                print(imgarr[0])
-                np.save(os.path.join(out_path, file)+'.npy', imgarr)
 
-
-    def NumpytoTiff(self, in_path, out_path):
-        for root, _, files in os.walk(in_path):
-            files.sort()
-            for file in files:
-
-                arr=np.load(os.path.join(in_path, file))
-                print(arr.dtype)
-
-                arr=np.asarray(arr,dtype='uint8')
-                arr=arr*255
-                print(type(file))
-                tiff.imwrite( os.path.join(out_path, file)+'.tiff', arr)
-
-    def removeBand(self, in_path, out_path, bands: list):
-        for root, _, files in os.walk(in_path):
-            files.sort()
-            for file in files:
-                arr=np.load(os.path.join(in_path, file))
-                arr = np.delete(arr, bands, axis=2)
-                np.save(os.path.join(out_path, file), arr)
 
     def changeValueMask(self, in_path,out_path):
         for root, _, files in os.walk(in_path):
@@ -91,14 +57,6 @@ class Preprocessing():
                 print(np.unique(arr))
                 np.save(os.path.join(out_path, file) , arr)
 
-    def toRGB(self, in_path,out_path):
-        for root, _, files in os.walk(in_path):
-            files.sort()
-            for file in files:
-                arr = np.load(os.path.join(in_path, file))
-                arr = arr[:, :, 1]
-                print(arr.shape)
-                np.save(os.path.join(out_path, file), arr)
 
 
 

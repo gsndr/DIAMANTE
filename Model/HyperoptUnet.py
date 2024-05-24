@@ -1,6 +1,5 @@
 import numpy as np
 from keras.callbacks import EarlyStopping, ModelCheckpoint
-import os
 import csv
 import math
 
@@ -23,15 +22,9 @@ import numpy as np
 from hyperopt import STATUS_OK
 from hyperopt import tpe, hp, Trials, fmin
 from keras import backend as K
-from keras.utils import to_categorical
-from sklearn.metrics import balanced_accuracy_score
-
-from sklearn.model_selection import train_test_split
-
 import time
 from sklearn.metrics import precision_recall_fscore_support, accuracy_score, confusion_matrix
 import image_generator as image_generator
-import image_generator_prediction as image_generator_prediction
 import Utils
 import satelliteUnet
 
@@ -55,51 +48,29 @@ iteration=1
 
     
 
-def trainNN(trainImage,testingImage, trainMask, testMask, name, size_test, resize, shape, attention):
+def trainNN(trainImage, trainMask,  name, size_test, resize, shape):
     print("Load dataset")
+
+
     global pathTrainImage
     pathTrainImage=trainImage
-    global pathTestImage
-    pathTestImage=testingImage
-    global testGlobal
+
+
 
     global pathTrainMask
     pathTrainMask = trainMask
-    global pathTestMask
-    pathTestMask = testMask
-
- 
-
-
-    global testGlobal
 
     global resizeGlobal
     resizeGlobal=resize
-    global attentionGlobal
-    attentionGlobal=attention
+
     global shapeImages
     shapeImages=shape
-
-  
-
 
 
     global Name
     Name = name
-    if attentionGlobal:
-        Name=Name+'_attention'
+
    
-    test = image_generator_prediction.ImageMaskGenerator(
-        images_folder=pathTestImage,
-        masks_folder=pathTestMask,
-        batch_size=size_test,
-        nb_classes=2, split=0, train=False, resize=resize, size=shapeImages
-    )
-
-    testGlobal=test
-
-
-
     trials = Trials()
 
     hyperparams = {"batch": hp.choice("batch", [4, 8, 16,32, 64]),
@@ -108,6 +79,7 @@ def trainNN(trainImage,testingImage, trainMask, testMask, name, size_test, resiz
 
     fmin(hyperopt_fcn, hyperparams, trials=trials, algo=tpe.suggest, max_evals=25)
 
+    print("done")
     return best_model
 
 
@@ -130,21 +102,24 @@ def hyperopt_fcn(params):
 
     global best_val_acc
     global best_test_acc
-    #global best_val_loss
 
     SavedParameters[-1].update(
-        {"time_training": time_training,  "augmentation": params["augmentation"],
+        {"time_training": time_training, "augmentation": params["augmentation"],
          "learning_rate": params["learning_rate"], "batch": params["batch"]})
+
+    SavedParameters[-1].update({ "iteration": iteration})
 
 
     if SavedParameters[-1]["F1_val"] > best_val_acc:
         print("new saved model:" + str(SavedParameters[-1]))
         best_model = model
+
         model.save(Name+'_model.h5')
         model.save(Name+'_model.tf')
         model.save_weights(Name+"_weights.h5")
 
         best_val_acc = SavedParameters[-1]["F1_val"]
+
 
 
     SavedParameters = sorted(SavedParameters, key=lambda i: float('-inf') if math.isnan(i['F1_val']) else i['F1_val'],
@@ -158,16 +133,18 @@ def hyperopt_fcn(params):
     except IOError:
         print("I/O error")
     iteration=iteration+1
+
     return {'loss': -val["F1_val"], 'status': STATUS_OK}
 
 
 def NN(pathTrainImage,pathTrainMask, params):
     print(params)
 
-    model=satelliteUnet.satellite_unet(shapeImages,attention=attentionGlobal)
+    model=satelliteUnet.satellite_unet(shapeImages)
     model.summary()
 
     batch_size = params['batch']
+
 
     generator = image_generator.ImageMaskGenerator(
         images_folder=pathTrainImage,

@@ -1,16 +1,7 @@
 import numpy as np
-from keras import Model, Input
 from keras.callbacks import EarlyStopping, ModelCheckpoint
-from keras.layers import Conv2D, Dense, Flatten, Lambda, Dropout, Conv2DTranspose
-from keras.optimizers import Adam
-
-import os
 import csv
 import math
-
-from keras import models
-from keras import layers
-import keras.metrics
 
 my_seed = 12
 np.random.seed(my_seed)
@@ -26,13 +17,8 @@ import numpy as np
 from hyperopt import STATUS_OK
 from hyperopt import tpe, hp, Trials, fmin
 from keras import backend as K
-from keras.utils import to_categorical
-from sklearn.metrics import balanced_accuracy_score
-
-from sklearn.model_selection import train_test_split
 
 import time
-
 from sklearn.metrics import precision_recall_fscore_support, accuracy_score, confusion_matrix
 import multi_image_generator as image_generator
 import multi_image_generator_prediction as image_generator_prediction
@@ -54,32 +40,23 @@ paramsGlobal = 0
 best_model = None
 teacherModel = 0
 trainable = 0
+iteration=1
 
 
-def trainNN(trainImage,testingImage, trainMask, testMask, name, size_test, resize, shape, shape1, attention, ch, ch1, mode, typeconcat):
+def trainNN(trainImage, trainMask, name, resize, shape, shape1,ch, ch1, mode, typeconcat):
     print("Load dataset")
     print(trainMask)
 
     global pathTrainImage
     pathTrainImage = trainImage
-    global pathTestImage
-    pathTestImage = testingImage
-    global testGlobal
-
-
 
 
     global pathTrainMask
     pathTrainMask = trainMask
-    global pathTestMask
-    pathTestMask = testMask
-
-    global testGlobal
 
     global resizeGlobal
     resizeGlobal = resize
-    global attentionGlobal
-    attentionGlobal = attention
+
     global shapeImages
     shapeImages = shape
 
@@ -102,25 +79,8 @@ def trainNN(trainImage,testingImage, trainMask, testMask, name, size_test, resiz
 
     global lateFusion
     lateFusion=mode
-    if attentionGlobal:
-        Name = Name + '_attention'
     if lateFusion==0:
         Name = Name + '_sum_'+str(sum)
-
-    test = image_generator_prediction.ImageMaskGenerator(
-        images_folder=pathTestImage,
-        masks_folder=pathTestMask,
-        batch_size=size_test,
-        nb_classes=2, split=0, train=False, resize=resize, size=shapeImages, ch=channel
-    )
-
-    testGlobal = test
-
-    global testGlobal1
-
-
-
-    testGlobal1 = test
 
 
     trials = Trials()
@@ -141,54 +101,11 @@ def hyperopt_fcn(params):
     start_time = time.time()
 
     print("start train")
+    global iteration
 
     model, val = NN(pathTrainImage, pathTrainMask, params)
 
     time_training = time.time() - start_time
-
-    print("start predict")
-
-    start_time = time.time()
-
-    if resizeGlobal:
-        shapeList = list(shapeImages)
-        shapeList[2] = int(channel - channel1)
-        shapeImagesNew = tuple(shapeList)
-
-        YTestGlobal, Y_predicted, _ = Utils.predictionWithResizeMulti(pathTestMask, testGlobal[0][0], model,
-                                                                 input_shape=shapeImagesNew)
-
-    else:
-        Y_predicted = model.predict(testGlobal[0][0], verbose=0, use_multiprocessing=True, workers=12)
-        YTestGlobal = testGlobal[0][1].ravel()
-        Y_predicted = ((Y_predicted > 0.5) + 0).ravel()
-
-    time_predict = time.time() - start_time
-
-    precision_macro_t, recall_macro_t, fscore_macro_t, support = precision_recall_fscore_support(YTestGlobal,
-                                                                                                 Y_predicted,
-                                                                                                 average='macro')
-    precision_micro_t, recall_micro_t, fscore_micro_t, support = precision_recall_fscore_support(YTestGlobal,
-                                                                                                 Y_predicted,
-                                                                                                 average='micro')
-    precision_weighted_t, recall_weighted_t, fscore_weighted_t, support = precision_recall_fscore_support(YTestGlobal,
-                                                                                                          Y_predicted,
-                                                                                                          average='weighted')
-
-    accuracy_t = accuracy_score(YTestGlobal, Y_predicted)
-    cf = confusion_matrix(YTestGlobal, Y_predicted)
-    r = Utils.res(cf)
-    if (len(cf) > 1):
-        tn, fp, fn, tp = cf.ravel()
-        iou = tp / (tp + fn + fp)
-    else:
-        tn = cf[0][0]
-        tp = 0
-        fp = 0
-        fn = 0
-        iou=0
-
-
 
     K.clear_session()
 
@@ -199,44 +116,23 @@ def hyperopt_fcn(params):
     # global best_val_loss
 
     SavedParameters[-1].update(
-        {"precision_macro_t": precision_macro_t, "recall_macro_t": recall_macro_t, "fscore_macro_t": fscore_macro_t,
-         "precision_micro_t": precision_micro_t, "recall_micro_t": recall_micro_t, "fscore_micro_t": fscore_micro_t,
-         "precision_weighted_t": precision_weighted_t, "recall_weighted_t": recall_weighted_t,
-         "fscore_weighted_t": fscore_weighted_t,
-         "accuracy_t": accuracy_t, "IOU_test": iou, "TP_test": tp,
-         "FN_test": fn, "FP_test": fp, "TN_test": tn,
-         "time_training": time_training, "time_predict": time_predict, "augmentation": params["augmentation"],
-         "learning_rate": params["learning_rate"], "batch": params["batch"]})
+        {"time_training": time_training, "augmentation": params["augmentation"],
+         "learning_rate": params["learning_rate"], "batch": params["batch"],  "iteration": iteration})
 
-    SavedParameters[-1].update({
-        "OA_test": r[0],
-        "P_test": r[2],
-        "R_test": r[3],
-        "F1_test": r[4],
-        "FAR_test": r[5],
-        "TPR_test": r[6]})
 
-    # if SavedParameters[-1]["val_loss"] < best_val_loss:
+
     if SavedParameters[-1]["F1_val"] > best_val_acc:
         print("new saved model:" + str(SavedParameters[-1]))
         best_model = model
-        import os
-        # model.save(Name.replace(".csv", "_model.h5"))
+
         model.save(Name + '_model.h5')
         model.save(Name + '_model.tf')
         model.save_weights(Name + "_weights.h5")
 
-        '''
-        for i in range(len(model.weights)):
-            model.weights[i]._handle_name = model.weights[i].name + "_" + str(i)
 
-        model.save_weights(Name.replace(".csv", "_Dweights.h5")) # OK, saved.
-        '''
-
-        # model.save_weights(Name.replace(".csv", "_Dweights.h5"))
         best_val_acc = SavedParameters[-1]["F1_val"]
 
-    # SavedParameters = sorted(SavedParameters, key=lambda i: i['F1_val'], reverse=True)
+
     SavedParameters = sorted(SavedParameters, key=lambda i: float('-inf') if math.isnan(i['F1_val']) else i['F1_val'],
                              reverse=True)
 
@@ -248,7 +144,7 @@ def hyperopt_fcn(params):
     except IOError:
         print("I/O error")
 
-    # return {'loss': -val["fscore_weighted_val"], 'status': STATUS_OK}
+    iteration = iteration + 1
     return {'loss': -val["F1_val"], 'status': STATUS_OK}
 
 
@@ -266,25 +162,15 @@ def NN(pathTrainImage, pathTrainMask, params):
     else:
         print("Middle fusion")
         from satelliteFuseUnet import satellite_unet
-        model = satellite_unet(shapeImagesNew, shapeImages1 sum=sum)
+        model = satellite_unet(shapeImagesNew, shapeImages1, sum=sum)
+        
 
     model.summary()
 
 
-    import CustomUnet
-
-    # model = CustomUnet.custom_unet((32, 32, 12))
-    #model=keras_segmentation.models.unet.unet(2, input_height=32, input_width=32, encoder_level=3, channels=10)
-
-    ####implement load ###
     batch_size = params['batch']
-    tf.keras.utils.plot_model(model, to_file='UnetLate.png', show_shapes=True, show_layer_names=True,expand_nested=True, show_layer_activations=True)
-    exit()
-
-
 
     generator = image_generator.ImageMaskGenerator(
-        # images_folder='../../Dataset/32_32/Train/images/',
         images_folder=pathTrainImage,
         masks_folder=pathTrainMask,
         batch_size=batch_size,
@@ -317,14 +203,11 @@ def NN(pathTrainImage, pathTrainMask, params):
 
     x_val = valid[0][0]
     y_val = (valid[0][1]).ravel()
-    #print(x_val.shape)
-    print(y_val.shape)
 
     Y_predicted = model.predict(x_val, verbose=0, use_multiprocessing=True, workers=12)
-    print(Y_predicted.shape)
+
     Y_predicted = ((Y_predicted > 0.5) + 0).ravel()
-    print(Y_predicted.shape)
-    print(y_val.shape)
+
     cfVal = confusion_matrix(y_val, Y_predicted)
     rVal = Utils.res(cfVal)
 

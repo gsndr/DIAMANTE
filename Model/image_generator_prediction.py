@@ -3,7 +3,6 @@ import math
 import os
 import random
 import numpy as np
-import cv2
 from Preprocessing import Preprocessing
 from pathlib import Path
 
@@ -28,9 +27,6 @@ class ImageMaskGenerator(tf.keras.utils.Sequence):
 
         for root, _, files in os.walk(images_folder):
             files.sort()
-
-            #files=sorted(files, key=lambda x: int(x.split('_')[1].split('.npy')[0]))
-            # Here we sort to have the folder in alphabetical order
             for file in files:
                 self.images_list.append(os.path.join(root, file))
     
@@ -73,33 +69,26 @@ class ImageMaskGenerator(tf.keras.utils.Sequence):
 
         for file in batch_x:
             a = np.load(file)
-            #a = a / 10000
             p=Path(file).name
-            #print(p)
             fileList.append(p)
-            #a = (a - np.min(a)) / (np.max(a) - np.min(a))
             if self.resize:
                 prep=Preprocessing()
                 a=prep.resize_with_padding(a, size=self.size)
             images.append(a)
-            #print(a.shape)
+
 
 
             
         images_batch=np.array(images).astype('float')
 
-
-        #images_batch = np.array([np.load(file) for file in batch_x]).astype('float')
         masks_raw=[]
         for file in batch_y:
             m=np.load(file)
             p=Path(file).name
             fileMask.append(p)
-            #print(p)
             if self.resize:
                 prep=Preprocessing()
                 m=prep.resize_with_padding(m, size=(self.size[0],self.size[1],1))
-            #print(m.shape)
             masks_raw.append(m)
         print(len(masks_raw))
         masks_batch=np.array(masks_raw).astype('float')

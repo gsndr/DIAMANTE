@@ -35,7 +35,7 @@ def satellite_unet(
         input_shape,
         num_classes=1,
         output_activation='sigmoid',
-        num_layers=4, attention=0):
+        num_layers=4):
     inputs = Input(input_shape)
   
 

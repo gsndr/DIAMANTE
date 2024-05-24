@@ -11,21 +11,6 @@ def dice_coef(y_true, y_pred, smooth=1):
 
 
 
-
-
-def accuracy_teacher(y_true, y_pred):
-    y_pred = y_pred[:, :, :, 0]
-    y_true_f = K.flatten(y_true)
-    y_pred_f = K.flatten(y_pred)
-    y_pred_f = tf.cast((y_pred_f > 0.5), tf.float32)
-    true_pos = K.sum(y_true_f * y_pred_f)
-    true_neg= K.sum((1-y_true_f) * (1-y_pred_f))
-    #tf.print("true pos :", true_pos)
-    #tf.print("true neg:", true_neg)
-    false_neg = K.sum(y_true_f * (1 - y_pred_f))
-    false_pos = K.sum((1 - y_true_f) * y_pred_f)
-    return (true_pos+true_neg)/(true_pos+true_neg+false_pos+false_neg)
-
 def accuracy(y_true, y_pred):
     y_pred_list =0
     for j in range(y_pred.shape[3]):
@@ -118,10 +103,5 @@ def focal_tversky_loss(y_true, y_pred, gamma=0.75):
 
 
 
-def feature_loss_function(fea, target_fea):
-    #intermediate=tf.cast(((fea > 0) | (target_fea > 0)), tf.float32)
-    #tf.print(intermediate)
-    return tf.norm(fea-target_fea, ord='euclidean')
-    #loss = (tf.math.abs(fea - target_fea)**2)
-    #return tf.math.sqrt(loss)
+
 
