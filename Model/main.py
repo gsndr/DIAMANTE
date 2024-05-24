@@ -41,6 +41,11 @@ def _getTiler(shape, tile_shape,mode):
                   tile_shape=tile_shape, mode=mode,
                   channel_dimension=None)
     return tiler
+
+def _returnNameImage(m_path):
+    name = m_path.split('_')[1]
+    name = name.split('.')[0]
+    return name
 def main():
     dataset = sys.argv[1]
     config = configparser.ConfigParser()
@@ -187,9 +192,7 @@ def main():
             # Here we sort to have the folder in alphabetical order
             for file in files:
                 mask_list.append(os.path.join(root, file))
-        
-        print(images_list)
-        print(mask_list)
+
         allPred = []
         allTrue=[]
         prep = Preprocessing()
@@ -228,9 +231,7 @@ def main():
 
             # Setup merging parameters
             imgAll=Utils.mergeImage(mask, pred_image)
-            name=m_path.split('_')[1]
-            name=name.split('.')[0]
-
+            name=_returnNameImage(m_path)
             imageio.imwrite(pathImagesSave + name+'.png', (imgAll * 255).astype(np.uint8))
             true_image = [arr.tolist() for arr in true_image]
             true_image = Utils.flattenList(true_image)
