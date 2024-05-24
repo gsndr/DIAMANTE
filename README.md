@@ -88,8 +88,7 @@ channels1=0
 tilesSize=32
 attack=1
 tiles=1
-pathSingleImages=Data/VitoPlanetary/Test1/Sentinel_2/
-pathSingleMask=Data/VitoPlanetary/Test1/Masks/
+
 
 
 
