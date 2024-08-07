@@ -62,6 +62,8 @@ All the required packages needed to run the download pipeline are described in `
 The repository contains the following scripts under the folder Model:
 * main.py:  script to execute DIAMANTE
 
+* Please specific the parameter of the dataset as reported in __CONFIG.conf__  file . E.g.,  To run the code the command is main.py NameOfDataset (es Sentinel12)
+
 
 ## Replicate the experiments
 
@@ -107,7 +109,7 @@ PREDICTION=1
 PREDICT_LATEUNET=0
 #if 1 the late U-net is used otherwise hybrid for train and prediction
 LATE=0
-# if 1 the training and prediciton is performed with SUM operator fusion otherwise it is odne with CONC operator
+# if 1 the training and prediciton is performed with SUM operator fusion otherwise it is done with CONC operator
 SUM=1
 
 
