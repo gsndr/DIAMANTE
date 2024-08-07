@@ -11,14 +11,14 @@ Please cite our work if you find it useful for your research and work.
 ```
  @article{,
  title = {DIAMANTE: A data-centric semantic segmentation approach to map tree dieback induced by bark beetle infestations via satellite images},
-journal = {},
+journal = {Journal of Intelligent Information Systems},
 volume = {},
 pages = {},
 year = {},
 issn = {},
 doi = {},
 url = {},
-author = {}}
+author = {G.Andresini, A. Appice, D.Ienco, V.Recchia}}
 
 ```
 
