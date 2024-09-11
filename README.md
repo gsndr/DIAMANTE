@@ -14,10 +14,10 @@ Please cite our work if you find it useful for your research and work.
 journal = {Journal of Intelligent Information Systems},
 volume = {},
 pages = {},
-year = {},
+year = {2024},
 issn = {},
-doi = {},
-url = {},
+doi = {https://doi.org/10.1007/s10844-024-00877-6},
+url = {https://link.springer.com/article/10.1007/s10844-024-00877-6},
 author = {G.Andresini, A. Appice, D.Ienco, V.Recchia}}
 
 ```
