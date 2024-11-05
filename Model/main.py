@@ -133,7 +133,7 @@ def main():
             # Train U-Net with generator
             import HyperoptLateUnet
             model = HyperoptLateUnet.trainNN(pathTrainImage, pathTestImage, pathTrainMask, pathTestMask, name_model,
-                                           size_test, resize, (shape, shape, ch),(shape, shape, ch1), ch=ch, ch1=ch1, mode=late, typeconcat=sum)
+                                           resize, (shape, shape, ch),(shape, shape, ch1), ch=ch, ch1=ch1, mode=late, typeconcat=sum)
         else:
 
             print('Train early fusion or single U-Net')
