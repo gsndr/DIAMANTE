@@ -5,11 +5,11 @@ The repository contains code refered to the work:
 
 _Giuseppina Andresini, Annalisa Appice, Dino Ienco, Vito Recchia_
 
-[DIAMANTE: A data-centric semantic segmentation approach to map tree dieback induced by bark beetle infestations via satellite images]() 
+[DIAMANTE: A data-centric semantic segmentation approach to map tree dieback induced by bark beetle infestations via satellite images](https://link.springer.com/article/10.1007/s10844-024-00877-6) 
 
 Please cite our work if you find it useful for your research and work.
 ```
- @article{,
+ @article{Andresini24,
  title = {DIAMANTE: A data-centric semantic segmentation approach to map tree dieback induced by bark beetle infestations via satellite images},
 journal = {Journal of Intelligent Information Systems},
 volume = {},
